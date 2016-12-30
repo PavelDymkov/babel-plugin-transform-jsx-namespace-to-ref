@@ -23,17 +23,17 @@ function trimString(string) {
 export default function({ types: t }) {
     const refAttributeBuilder = {
         asThisProperty(elementName, options) {
-            let pathSource = createPathSourceStartWithThis(options.path);
+            let pathSource = createPathSourceStartsWithThis(options.path);
             let path = createPath(pathSource);
 
-            return createRefToPathHandler(elementName, path);
+            return createRefExpression(elementName, path);
         },
         legacy(elementName) {
             return t.stringLiteral(elementName);
         }
     };
 
-    function createPathSourceStartWithThis(source) {
+    function createPathSourceStartsWithThis(source) {
         source = trimString(source);
 
         if (!source)
@@ -55,7 +55,7 @@ export default function({ types: t }) {
             .filter(hasValue);
     }
 
-    function createRefToPathHandler(name, path) {
+    function createRefExpression(name, path) {
         path.push(name);
 
         let params = [t.identifier(name)];

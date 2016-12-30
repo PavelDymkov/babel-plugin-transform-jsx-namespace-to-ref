@@ -43,7 +43,7 @@ To specify the path for element
 ```json
 {
   "plugins": [[
-    "babel-plugin-transform-jsx-namespace-to-ref", {
+    "transform-jsx-namespace-to-ref", {
       "refType": "asThisProperty",
       "path": "property"
     }
@@ -78,7 +78,7 @@ class MyComponent extends React.Component {
 ```json
 {
   "plugins": [[
-    "babel-plugin-transform-jsx-namespace-to-ref", {
+    "transform-jsx-namespace-to-ref", {
       "refType": "legacy"
     }
   ]]
