@@ -47,7 +47,6 @@ To specify the path for element
       "refType": "asThisProperty",
       "path": "property"
     }
-  }
   ]]
 }
 ```
@@ -82,7 +81,6 @@ class MyComponent extends React.Component {
     "transform-async-generator-functions", {
       "refType": "legacy"
     }
-  }
   ]]
 }
 ```
