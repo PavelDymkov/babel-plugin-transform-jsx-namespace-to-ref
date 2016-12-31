@@ -1,7 +1,7 @@
 {
   "name": "babel-plugin-transform-jsx-namespace-to-ref",
   "version": "0.9.0",
-  "description": "Transform JSXMemberExpression to ref property",
+  "description": "Transform JSXNamespacedName to ref property",
   "main": "lib/index.js",
   "scripts": {
     "build": "babel src --out-dir lib",
