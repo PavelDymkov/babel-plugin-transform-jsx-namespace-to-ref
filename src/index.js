@@ -110,22 +110,35 @@ export default function({ types: t }) {
         path.unshiftContainer("attributes", attribute);
     }
 
-  return {
-    inherits: require("babel-plugin-syntax-jsx"),
+    function replaceClosingElement(path, identifier) {
+        let closingElement = t.jSXClosingElement(identifier);
 
-    visitor: {
-        JSXNamespacedName(path, state) {
-            let namespaceNode = path.get("namespace").node;
-            let elementName = namespaceNode.name;
-            let jsxOpeningElement = path.findParent(path => path.isJSXOpeningElement());
-
-            appendRefAttribute(jsxOpeningElement, elementName, state.opts);
-
-            let tagNode = path.get("name").node;
-            let tagName = tagNode.name;
-
-            path.replaceWith(t.jSXIdentifier(tagName));
-        }
+        path.replaceWith(closingElement);
     }
-  };
+
+    return {
+        inherits: require("babel-plugin-syntax-jsx"),
+
+        visitor: {
+            JSXNamespacedName(path, state) {
+                let namespaceNode = path.get("namespace").node;
+                let elementName = namespaceNode.name;
+
+                let jsxElement = path.findParent(path => path.isJSXElement());
+                let jsxOpeningElement = jsxElement.get("openingElement");
+                let jsxClosingElement = jsxElement.get("closingElement");
+
+                appendRefAttribute(jsxOpeningElement, elementName, state.opts);
+
+                let tagNode = path.get("name").node;
+                let tagName = tagNode.name;
+
+                let tagIdentifier = t.jSXIdentifier(tagName);
+
+                replaceClosingElement(jsxClosingElement, tagIdentifier);
+
+                path.replaceWith(tagIdentifier);
+            }
+        }
+    };
 };

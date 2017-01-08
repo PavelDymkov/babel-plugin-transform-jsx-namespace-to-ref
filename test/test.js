@@ -36,6 +36,29 @@ describe("transform-jsx-namespace-to-ref tests", () => {
             assert.isTrue(isEquil(defaultInput, output, options));
         });
 
+        it("should check transpiling jSXClosingElement", () => {
+            let input = `
+                class Test extends React.Component {
+                    render() {
+                        return <name:div>
+                            some text
+                        </name:div>
+                    }
+                }
+            `;
+            let output = `
+                class Test extends React.Component {
+                    render() {
+                        return <div ref={name => this.name = name}>
+                            some text
+                        </div>;
+                    }
+                }
+            `;
+
+            assert.isTrue(isEquil(input, output, options));
+        });
+
         it("should check JSX MemberExpression", () => {
             let input = `
                 class Test extends React.Component {
