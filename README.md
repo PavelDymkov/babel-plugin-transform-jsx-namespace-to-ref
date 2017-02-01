@@ -71,6 +71,41 @@ class MyComponent extends React.Component {
 }
 ```
 
+### asThisMethod option
+
+**.babelrc**
+
+```json
+{
+  "plugins": [[
+    "transform-jsx-namespace-to-ref", {
+      "refType": "asThisMethod",
+      "path": "methodName"
+    }
+  ]]
+}
+```
+
+**In**
+
+```javascript
+class MyComponent extends React.Component {
+  render() {
+    return <myDiv:div />
+  }
+}
+```
+
+**Out**
+
+```javascript
+class MyComponent extends React.Component {
+  render() {
+    return <div ref={myDiv => this.methodName("myDiv", myDiv)} />;
+  }
+}
+```
+
 ### legacy option
 
 **.babelrc**
