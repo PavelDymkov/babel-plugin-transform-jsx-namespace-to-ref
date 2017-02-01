@@ -170,6 +170,37 @@ describe("transform-jsx-namespace-to-ref tests", () => {
         });
     });
 
+    describe("asThisMethod", () => {
+        let params = { refType: "asThisMethod" };
+        let options = {
+            plugins: [["transform-jsx-namespace-to-ref", params]]
+        };
+
+        it("should check \"asThisMethod\" refType", () => {
+            params.path = "method";
+
+            let output = `
+                class Test extends React.Component {
+                    render() {
+                        return <Component ref={name => this.method("name", name)} />;
+                    }
+                }
+            `;
+
+            assert.isTrue(isEquil(defaultInput, output, options));
+        });
+
+        it("should throw an exception", () => {
+            params.path = "";
+
+            function execute() {
+                babel.transform(defaultInput, options);
+            }
+
+            assert.throw(execute, Error);
+        });
+    });
+
     describe("legacy", () => {
         let options = {
             plugins: [["transform-jsx-namespace-to-ref", { refType: "legacy" }]]

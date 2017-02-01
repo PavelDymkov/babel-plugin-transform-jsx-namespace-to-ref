@@ -4,7 +4,8 @@ const identifierTester = /^[A-z$][\w$]*$/;
 const stringLiteralTester = /^(["].*["])|(['].*['])$/;
 const numericLiteralTester = /^\d+$/;
 const errors = {
-    UNKNOWN_REFTYPE: "unknown refType, using default"
+    UNKNOWN_REFTYPE: "unknown refType, using default",
+    NO_METHOD: "method name is not defined, set up \"path\" parameter"
 };
 
 function hasValue(value) {
@@ -26,8 +27,28 @@ export default function({ types: t }) {
             let pathSource = createPathSourceStartsWithThis(options.path);
             let path = createPath(pathSource);
 
-            return createRefExpression(elementName, path);
+            path.push(elementName);
+
+            let functionBody =
+                t.assignmentExpression("=", buildPathAST(path), t.identifier(elementName));
+
+            return createArrayFunction(elementName, functionBody);
         },
+
+        asThisMethod(elementName, options) {
+            let pathSource = createPathSourceStartsWithThis(options.path);
+            let path = createPath(pathSource);
+
+            if (path.length < 2) {
+                throw new Error(errors.NO_METHOD);
+            }
+
+            let functionBody =
+                t.callExpression(buildPathAST(path), [t.stringLiteral(elementName), t.identifier(elementName)]);
+
+            return createArrayFunction(elementName, functionBody);
+        },
+
         legacy(elementName) {
             return t.stringLiteral(elementName);
         }
@@ -55,11 +76,8 @@ export default function({ types: t }) {
             .filter(hasValue);
     }
 
-    function createRefExpression(name, path) {
-        path.push(name);
-
-        let params = [t.identifier(name)];
-        let body = t.assignmentExpression("=", buildPathAST(path), t.identifier(name));
+    function createArrayFunction(paramName, body) {
+        let params = [t.identifier(paramName)];
         let arrowFunction = t.arrowFunctionExpression(params, body);
 
         return t.jSXExpressionContainer(arrowFunction);
