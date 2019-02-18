@@ -1,3 +1,6 @@
+const not = require("logical-not");
+
+
 const defaultRefAttributeBuilderType = "asThisProperty";
 const pathSeparator = /[.\[\]]/;
 const identifierTester = /^[A-z$][\w$]*$/;
@@ -57,8 +60,7 @@ export default function({ types: t }) {
     function createPathSourceStartsWithThis(source) {
         source = trimString(source);
 
-        if (!source)
-          return "this";
+        if (not(source)) return "this";
 
         if (source.startsWith("this"))
           return source;

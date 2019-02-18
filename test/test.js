@@ -1,13 +1,7 @@
 const babel = require("babel-core");
-const {assert} = require("chai");
-
-const spaces = /\s+/g;
-
-function isEquil(input, expected, options) {
-    let output = babel.transform(input, options).code;
-
-    return output.replace(spaces, "") == expected.replace(spaces, "");
-}
+const transformJsxNamespaceToRef = require("../");
+const isEquil = require("babel-plugin-test-helper")(transformJsxNamespaceToRef);
+const { assert } = require("chai");
 
 
 describe("transform-jsx-namespace-to-ref tests", () => {
@@ -20,10 +14,6 @@ describe("transform-jsx-namespace-to-ref tests", () => {
     `;
 
     describe("default behavior", () => {
-        let options = {
-            plugins: ["transform-jsx-namespace-to-ref"]
-        };
-
         it("should check default options", () => {
             let output = `
                 class Test extends React.Component {
@@ -33,7 +23,7 @@ describe("transform-jsx-namespace-to-ref tests", () => {
                 }
             `;
 
-            assert.isTrue(isEquil(defaultInput, output, options));
+            assert.isTrue(isEquil(defaultInput, output));
         });
 
         it("should check transpiling jSXClosingElement", () => {
@@ -56,7 +46,7 @@ describe("transform-jsx-namespace-to-ref tests", () => {
                 }
             `;
 
-            assert.isTrue(isEquil(input, output, options));
+            assert.isTrue(isEquil(input, output));
         });
 
         it("should check JSX MemberExpression", () => {
@@ -75,19 +65,12 @@ describe("transform-jsx-namespace-to-ref tests", () => {
                 }
             `;
 
-            assert.isTrue(isEquil(input, output, options));
+            assert.isTrue(isEquil(input, output));
         });
     });
 
     describe("asThisProperty", () => {
-        let params = {};
-        let options = {
-            plugins: [["transform-jsx-namespace-to-ref", params]]
-        };
-
         it("should check empty path", () => {
-            params.path = "";
-
             let output = `
                 class Test extends React.Component {
                     render() {
@@ -96,12 +79,10 @@ describe("transform-jsx-namespace-to-ref tests", () => {
                 }
             `;
 
-            assert.isTrue(isEquil(defaultInput, output, options));
+            assert.isTrue(isEquil(defaultInput, output, { path: "" }));
         });
 
         it("should check \"this\" in path", () => {
-            params.path = "this";
-
             let output = `
                 class Test extends React.Component {
                     render() {
@@ -110,12 +91,10 @@ describe("transform-jsx-namespace-to-ref tests", () => {
                 }
             `;
 
-            assert.isTrue(isEquil(defaultInput, output, options));
+            assert.isTrue(isEquil(defaultInput, output, { path: "this" }));
         });
 
         it("should check simple path", () => {
-            params.path = "some";
-
             let output = `
                 class Test extends React.Component {
                     render() {
@@ -124,12 +103,10 @@ describe("transform-jsx-namespace-to-ref tests", () => {
                 }
             `;
 
-            assert.isTrue(isEquil(defaultInput, output, options));
+            assert.isTrue(isEquil(defaultInput, output, { path: "some" }));
         });
 
         it("should check path with numeric literal", () => {
-            params.path = "[1].some";
-
             let output = `
                 class Test extends React.Component {
                     render() {
@@ -138,12 +115,10 @@ describe("transform-jsx-namespace-to-ref tests", () => {
                 }
             `;
 
-            assert.isTrue(isEquil(defaultInput, output, options));
+            assert.isTrue(isEquil(defaultInput, output, { path: "[1].some" }));
         });
 
         it("should check path with string literal", () => {
-            params.path = "['some']";
-
             let output = `
                 class Test extends React.Component {
                     render() {
@@ -152,12 +127,10 @@ describe("transform-jsx-namespace-to-ref tests", () => {
                 }
             `;
 
-            assert.isTrue(isEquil(defaultInput, output, options));
+            assert.isTrue(isEquil(defaultInput, output, { path: "['some']" }));
         });
 
         it("should check \"this\" in path and double quotes string literal", () => {
-            params.path = 'this["some"]';
-
             let output = `
                 class Test extends React.Component {
                     render() {
@@ -166,19 +139,12 @@ describe("transform-jsx-namespace-to-ref tests", () => {
                 }
             `;
 
-            assert.isTrue(isEquil(defaultInput, output, options));
+            assert.isTrue(isEquil(defaultInput, output, { path: 'this["some"]' }));
         });
     });
 
     describe("asThisMethod", () => {
-        let params = { refType: "asThisMethod" };
-        let options = {
-            plugins: [["transform-jsx-namespace-to-ref", params]]
-        };
-
         it("should check \"asThisMethod\" refType", () => {
-            params.path = "method";
-
             let output = `
                 class Test extends React.Component {
                     render() {
@@ -187,14 +153,14 @@ describe("transform-jsx-namespace-to-ref tests", () => {
                 }
             `;
 
-            assert.isTrue(isEquil(defaultInput, output, options));
+            assert.isTrue(isEquil(defaultInput, output, { refType: "asThisMethod", path: "method" }));
         });
 
         it("should throw an exception", () => {
-            params.path = "";
-
             function execute() {
-                babel.transform(defaultInput, options);
+                babel.transform(defaultInput, {
+                    plugins: [[transformJsxNamespaceToRef, { refType: "asThisMethod", path: "" }]],
+                });
             }
 
             assert.throw(execute, Error);
@@ -202,15 +168,11 @@ describe("transform-jsx-namespace-to-ref tests", () => {
     });
 
     describe("legacy", () => {
-        let options = {
-            plugins: [["transform-jsx-namespace-to-ref", { refType: "legacy" }]]
-        };
-
         it("should check legacy refType", () => {
             let input = `<name:Component />`;
             let output = `<Component ref="name" />;`;
 
-            assert.isTrue(isEquil(input, output, options));
+            assert.isTrue(isEquil(input, output, { refType: "legacy" }));
         });
     });
 });

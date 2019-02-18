@@ -1,6 +1,6 @@
 {
   "name": "babel-plugin-transform-jsx-namespace-to-ref",
-  "version": "0.10.1",
+  "version": "1.0.0",
   "description": "Transform JSXNamespacedName to ref property",
   "main": "lib/index.js",
   "scripts": {
@@ -22,12 +22,14 @@
   "author": "Pavel Dymkov <dymkov86@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "babel-cli": "^6.18.0",
-    "babel-preset-es2015": "^6.18.0",
-    "chai": "^3.5.0",
-    "mocha": "^3.2.0"
+    "babel-cli": "^6.26.0",
+    "babel-plugin-test-helper": "^1.0.0",
+    "babel-preset-es2015": "^6.24.1",
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0"
   },
   "dependencies": {
-    "babel-plugin-syntax-jsx": "^6.18.0"
+    "babel-plugin-syntax-jsx": "^6.18.0",
+    "logical-not": "^1.0.0"
   }
 }
